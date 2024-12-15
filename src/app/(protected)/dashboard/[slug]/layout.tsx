@@ -1,16 +1,20 @@
 import React from 'react'
 import SideBar from '@/components/global/sliderbar'
 import NavBar from '@/components/global/Navbar'
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query'
+import { prefetchUserAutomations, PrefetchUserProfile } from '@/react-query/prefetch'
 type Props = {
     children: React.ReactNode
     params: {slug: string}
 }
 
-const layout = ({children, params}: Props) => {
+const layout = async ({children, params}: Props) => {
+  const query = new QueryClient()
+  await PrefetchUserProfile(query)
+  await prefetchUserAutomations(query)
 
-
-    // Query client (using react Query)
-  return (
+  return ( 
+    <HydrationBoundary state={dehydrate(query)}>
     <div className='p-3'>
         {/* siderBar */}
         <SideBar slug={params.slug} />
@@ -29,6 +33,7 @@ const layout = ({children, params}: Props) => {
           {children}
         </div>
         </div>
+        </HydrationBoundary>
   )
 }
 
