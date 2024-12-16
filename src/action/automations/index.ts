@@ -3,16 +3,17 @@
 import { OnCurrentUser } from "../user"
 import { createAutomation, getAutomations } from "./queries"
 
-export const createAutomations = async (id: string) => {
+export const createAutomations = async (id?: string) => {
     const user = await OnCurrentUser()
     try {
-        const create = await createAutomation(user.id)
-        if(create) return {status: 200, data: 'Automation created.'}
-        return {status: 404, data: 'Oops! Something went wrong.'}
+      const create = await createAutomation(user.id, id)
+      if (create) return { status: 200, data: 'Automation created', res: create }
+  
+      return { status: 404, data: 'Oops! something went wrong' }
     } catch (error) {
-        return {status: 500, data: 'Internal server error'}
+      return { status: 500, data: 'Internal server error' }
     }
-}
+  }
 
 export const getAllAutomations = async () => {
     const user = await OnCurrentUser()
