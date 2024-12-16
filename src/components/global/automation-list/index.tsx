@@ -5,14 +5,14 @@ import Link from 'next/link'
 import React, { useMemo } from 'react'
 import GradientButton from '../gradient-button'
 import { Button } from '@/components/ui/button'
-import { useQueryAutomation } from '@/hooks/use-query-automation'
+import { useQueryAutomations } from '@/hooks/use-query-automation'
 import CreateAutomation from '../create-automation'
 import { useMutationDataState } from '@/hooks/use-mutation-data'
 
 type Props = {}
 
 const AutomationList = (props: Props) => {
-  const { data } = useQueryAutomation()
+  const { data } = useQueryAutomations()
 
   const { latestVariable } = useMutationDataState(['create-automation'])
   console.log(latestVariable)

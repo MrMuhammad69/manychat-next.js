@@ -1,17 +1,28 @@
+import { getAutomationsInfo } from '@/action/automations'
 import AutomationBreadCrumbs from '@/components/global/automation-bread-crumbs'
+import ThenNode from '@/components/global/then-node'
 import Trigger from '@/components/global/trigger'
-import { Warning } from '@/icons'
+import { Warning } from '@/icons' 
+import { prefetchUserAutomation } from '@/react-query/prefetch'
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query'
 import React from 'react'
 
 type Props = {
     params: {id: string}
 
 }
-// WIP: Set some metadata stuff boy.
-const page = ({params}: Props) => {
 
-    //WIP: prefect user automation data bases on props 
+export async function generateMetadata({params}: Props) {
+  const info = await getAutomationsInfo(params.id)
+  return {
+    title: info?.data?.name,
+  }
+}
+const page = async ({params}: Props) => {
+  const query = new QueryClient()
+  await prefetchUserAutomation(query,params.id)
   return (
+    <HydrationBoundary state={dehydrate(query)}>
     <div className='flex flex-col items-center gap-y-20'>
         <AutomationBreadCrumbs id={params.id} />
         <div className='w-full lg:w-10/12 xl:w-6/12 p-5 rounded-xl flex flex-col bg-[#1d1d1d] gap-y-3'>
@@ -20,8 +31,10 @@ const page = ({params}: Props) => {
         When...
         </div>
         <Trigger id={params.id} />
+        <ThenNode id={params.id} />
         </div>
     </div>
+    </HydrationBoundary>
   )
 }
 
