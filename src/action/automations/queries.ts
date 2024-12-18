@@ -21,7 +21,7 @@ export const createAutomation = async (clerkId: string, id?: string) => {
 
 
 export const getAutomations = async (clerkId:string) => {
-    return await client.user.findUnique({where:{clerkId}, select: {
+    return await client.user.findFirst({where:{clerkId}, select: {
         automations: {
             orderBy: {
                 createdAt: 'asc'
@@ -141,4 +141,44 @@ export const deleteWord = async (id: string)=> {
       id: id
     }
   })
+}
+
+
+export const addPost = async (id:string, posts: {
+  postid: string
+  catpion?: string
+  media: string
+  mediaType: 'IMAGE' | 'VIDEO' | 'CAROSEL_ALBUM'
+}) => {
+  return await client.automation.update({
+    where: {
+      id: id
+    },
+    data:{
+      posts: {
+        createMany: {
+          data: posts
+        }
+      }
+    }
+  })
+}
+
+
+export const updateSubscription = async (clerkId: string, props: {customerId?: string, plan?: "PRO" | 'FREE' })=> {
+  return await client.user.update({
+    where:{
+      clerkId: clerkId
+    },
+    data: {
+      subscription: {
+        update: {
+          data: {
+            ...props,
+          }
+        }
+      }
+    }
+  })
+  
 }

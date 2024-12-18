@@ -1,8 +1,10 @@
 'use server'
 
+import { stripe } from "@/lib/stripe"
 import { OnCurrentUser } from "../user"
 import { findUser } from "../user/queries"
-import { addListener, addTrigger, createAutomation, createKeyword, deleteWord, findAutomation, getAutomations, updateAutomation } from "./queries"
+import { addListener, addPost, addTrigger, createAutomation, createKeyword, deleteWord, findAutomation, getAutomations, updateAutomation, updateSubscription } from "./queries"
+import { redirect } from "next/navigation"
 
 export const createAutomations = async (id?: string) => {
     const user = await OnCurrentUser()
@@ -126,3 +128,58 @@ export const getProfilePosts = async () => {
     return { status: 500 }
   }
 }
+
+
+
+export const savePosts = async (automationId: string, posts: {
+  postid: string
+  caption?: string
+  media: string
+  mediaType: 'IMAGE' | 'VIDEO' | 'CAROSEL_ALBUM'
+})=> {
+  await OnCurrentUser()
+  try {
+    const saved = await addPost(automationId, posts)
+  if(saved) return {status: 201, data: 'Post Created'}
+  return {status: 400, data: 'Unable to create post'}
+  } catch (error) {
+    return {status: 500, data: 'Internal Server Error'}
+  }
+}
+
+export const activateAutomation = async (id: string, state:boolean )=> {
+  await OnCurrentUser()
+  try {
+    const update = await updateAutomation(id, {active: state})
+    if(update) return {status: 200, data: `Automation ${state ? 'activated' : 'deactivated'}`}
+    return {status: 400, data: 'Unable to activate the automation'}
+  } catch (error) {
+    return {status: 500, data: 'Internal Server Error'}
+  }
+}
+
+
+ export const onSubscribe = async (session_id: string) => {
+  const user  = await OnCurrentUser()
+  try {
+    const session = await stripe.checkout.sessions.retrieve(session_id)
+    if(session){
+      const subscribed = await updateSubscription(user.id, {customerId: session.customer as string, plan: 'PRO'})
+      if(subscribed) {
+        return {status: 200}
+      }
+      return {status: 400, data: 'Unable to subscribe'}
+    }
+  } catch (error) {
+    return {status: 500}
+  }
+  
+ }
+
+
+ export const onOAuthInstagram =  async (strategy: "INSTAGRAM" | "CRM") => {
+  if(strategy === 'INSTAGRAM'){
+    return redirect(process.env.INSTAGRAM_EMBEDDED_OAUTH_URL as string)
+  }
+  
+ }

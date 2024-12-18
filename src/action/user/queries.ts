@@ -3,7 +3,7 @@
 import { client } from "@/lib/prisma"
 
 export const findUser = async (clerkId:string)=> {
-    return await client.user.findUnique({where:{clerkId}, include:{
+    return await client.user.findFirst({where:{clerkId}, include:{
         subscription: true,
         integrations: {
             select: {

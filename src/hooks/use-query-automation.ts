@@ -1,5 +1,5 @@
 'use client'
-import { getAllAutomations, getAutomationsInfo } from "@/action/automations"
+import { getAllAutomations, getAutomationsInfo, getProfilePosts } from "@/action/automations"
 import { onUserInfo } from "@/action/user"
 import { useQuery } from "@tanstack/react-query"
 
@@ -21,6 +21,15 @@ export const useQueryAutomation = (id: string) => {
 export const useQueryUser = ()=> {
     return useQuery({
         queryKey: ['user-profile'],
-        queryFn: onUserInfo,
+        queryFn: onUserInfo
+    })
+}
+
+export const useQueryAutomationPost = () => {
+    const fetchPosts = async () => await getProfilePosts()
+    return useQuery({
+        queryKey: ['intagram-media'],
+        queryFn: fetchPosts,
+        
     })
 }

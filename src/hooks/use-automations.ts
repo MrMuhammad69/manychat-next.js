@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from "react"
 import { useMutationData } from "./use-mutation-data"
-import { createAutomations, deleteKeyword, saveKeyword, saveListener, saveTrigger, updateAutomationName } from "@/action/automations"
+import { createAutomations, deleteKeyword, saveKeyword, saveListener, savePosts, saveTrigger, updateAutomationName } from "@/action/automations"
 import * as z from 'zod'
 import useZodForm from "./use-zod-form"
 import { AppDispatch, useAppSelector } from "@/redux/store"
@@ -121,4 +121,39 @@ export const useKeywords =  (id: string) => {
   const {mutate: deleteMutation} = useMutationData(['delete-keyword'],(data: {id: string})=> deleteKeyword(data.id), 'automation-info')
 
   return {onValueChange,keyword, onKeyPress, deleteMutation }
+}
+
+
+export const useAutomationPosts = (id: string) => {
+  const [posts, setPosts] = useState<
+    {
+      postid: string
+      caption?: string
+      media: string
+      mediaType: 'IMAGE' | 'VIDEO' | 'CAROSEL_ALBUM'
+    }[]
+  >([])
+
+  const onSelectPost = (post: {
+    postid: string
+    caption?: string
+    media: string
+    mediaType: 'IMAGE' | 'VIDEO' | 'CAROSEL_ALBUM'
+  }) => {
+    setPosts((prevItems) => {
+      if (prevItems.find((p) => p.postid === post.postid)) {
+        return prevItems.filter((item) => item.postid !== post.postid)
+      } else {
+        return [...prevItems, post]
+      }
+    })
+  }
+
+  const { mutate, isPending } = useMutationData(
+    ['attach-posts'],
+    () => savePosts(id, posts),
+    'automation-info',
+    () => setPosts([])
+  )
+  return { posts, onSelectPost, mutate, isPending }
 }

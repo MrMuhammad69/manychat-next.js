@@ -1,5 +1,6 @@
 import { getAutomationsInfo } from '@/action/automations'
 import AutomationBreadCrumbs from '@/components/global/automation-bread-crumbs'
+import PostNode from '@/components/global/post-node'
 import ThenNode from '@/components/global/then-node'
 import Trigger from '@/components/global/trigger'
 import { Warning } from '@/icons' 
@@ -15,6 +16,7 @@ type Props = {
 export async function generateMetadata({params}: Props) {
   const info = await getAutomationsInfo(params.id)
   return {
+    //@ts-expect-error
     title: info?.data?.name,
   }
 }
@@ -32,6 +34,7 @@ const page = async ({params}: Props) => {
         </div>
         <Trigger id={params.id} />
         <ThenNode id={params.id} />
+        <PostNode id={params.id} />
         </div>
     </div>
     </HydrationBoundary>
